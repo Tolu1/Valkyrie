@@ -1,2 +1,2 @@
 # Valkyrie
-Valkyrie🤍 is taking baby steps now! uwu
+[Valkyrie🤍](https://t.me/ValkyrieIsABot) is taking baby steps, uwu
