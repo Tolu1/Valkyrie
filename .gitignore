@@ -1,5 +1,9 @@
 # custom
 private_key_valkyrie.json
+Pipfile
+Pipfile.lock
+playground.py
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
