@@ -2,7 +2,6 @@
 #                        NLP PREPROCESSING PIPELINE                       #
 # ======================================================================= #
 class Pipeline():
-    pass
 
     def clean(self):
         pass

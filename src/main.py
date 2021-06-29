@@ -9,7 +9,12 @@ load_dotenv()
 
 API_KEY = os.getenv('TELEGRAM_API_KEY')
 bot = telebot.TeleBot(API_KEY)
-dflow = Dialogflow('./private_key_valkyrie.json')
+
+# Dialogflow
+dflow = Dialogflow()
+CREDENTIALS_PATH = os.getenv('CREDENTIALS_PATH')
+dflow.set_credentials(CREDENTIALS_PATH) # set credentials path in .env file
+dflow.connect()
 
 command_char = '!'
 

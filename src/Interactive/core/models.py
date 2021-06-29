@@ -9,41 +9,56 @@ from google.cloud import dialogflow_v2 as dflow
 from google.api_core.exceptions import InvalidArgument
 
 class Dialogflow():
+    
+    def connect(self):
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = self.get_credentials()
 
-    def __init__(self, credentials=None, logging=True):
-        if credentials == None:
-            credentials='./private_key.json'
+        with open(self.credentials, 'r') as data:
+            self.project_id = json.load(data)['project_id']
+        self.language_code = 'en'
+        self.sessions_id = uuid.uuid4()
+        self.sessions_client = dflow.SessionsClient()
+        self.session = self.sessions_client.session_path(self.project_id, self.sessions_id)
 
-        if not os.path.exists(credentials):
-            raise FileNotFoundError('Missing credentials for Google Dialogflow --> Make sure file path exists')
-            
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials
-
-        with open(credentials, 'r') as data:
-            self.DIALOGFLOW_PROJECT_ID = json.load(data)['project_id']
-        self.DIALOGFLOW_LANGUAGE_CODE = 'en'
-        self.SESSION_ID = uuid.uuid4()
-
-        self.logging = logging
 
     def info(self):
         return 'Powered by Google Diagflow!📣'
 
     def set_session_id(self, session_id):
-        self.SESSION_ID = session_id
+        self.sessions_id = session_id
 
-    def interact(self, text):
-        session_client = dflow.SessionsClient()
-        session = session_client.session_path(self.DIALOGFLOW_PROJECT_ID, self.SESSION_ID)
-        text_input = dflow.types.TextInput(text=text, language_code=self.DIALOGFLOW_LANGUAGE_CODE)
+    def set_credentials(self, credentials):
+        self.credentials = credentials
+    
+    def get_credentials(self):  
+        
+        # default path
+        if hasattr(self, 'credentials') is False:  
+            self.set_credentials('./private_key.json')  
+        if self.credentials is None:  
+            self.set_credentials('./private_key.json')
+        if not os.path.exists(self.credentials):
+            raise FileNotFoundError('Missing credentials for Google Dialogflow --> Make sure file path exists')
+        return self.credentials
+        
+    def console(self):
+        print('===================================Welcome to Dialogflow Console===================================')
+        try:
+            while True:
+                print(self.interact(input()))
+        except KeyboardInterrupt:
+            print('> You stopped the Console.')
+        
+    def interact(self, text, logging=False):
+        text_input = dflow.types.TextInput(text=text, language_code=self.language_code)
         query_input = dflow.types.QueryInput(text=text_input)
 
         try:
-            response = session_client.detect_intent(session=session, query_input=query_input)
+            response = self.sessions_client.detect_intent(session=self.session, query_input=query_input)
         except InvalidArgument:
             raise
 
-        if self.logging:
+        if logging:
             log = f"""Query text: {response.query_result.query_text}
 Detected intent: {response.query_result.intent.display_name}
 Detected intent confidence: {response.query_result.intent_detection_confidence}
@@ -52,3 +67,8 @@ Fulfillment text: {response.query_result.fulfillment_text}
             print(log)
 
         return response.query_result.fulfillment_text
+
+    class Rasa():
+        
+        def info(self):
+            return 'Rasa will be coming soon!📣'
